@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video with Slogan Animation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: black;
+      display: flex;
+      flex-direction: column;
+    }
+
+    video {
+      width: 100%;
+      height: 80%;
+      object-fit: cover;
+    }
+
+    #slogan-container {
+      height: 20%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      text-align: center;
+      position: relative;
+      opacity: 0;
+    }
+
+    #slogan {
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 0 10px #4CAF50, 0 0 20px #4CAF50, 0 0 30px #4CAF50, 0 0 40px #4CAF50;
+    }
+
+    #loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid transparent;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    #start-button {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #start-button:hover {
+      background-color: #45a049;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+  <!-- Content Security Policy to allow inline scripts (using nonce for security) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-abc123';">
+</head>
+<body>
+  <video id="test-video" autoplay controls>
+    <source src="./Images/InShot_20241130_220023354.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <div id="slogan-container">
+    <div id="slogan">Tasty Hub</div>
+    <div id="loading-spinner"></div>
+  </div>
+  
+  <button id="start-button">Let's Get Started</button>
+
+  <!-- GSAP and TextPlugin libraries for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" nonce="abc123"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js" nonce="abc123"></script>
+  <script nonce="abc123">
+    // Register GSAP TextPlugin for text animations
+    gsap.registerPlugin(gsap.plugins.TextPlugin);
+
+    const video = document.getElementById('test-video');
+    const sloganContainer = document.getElementById('slogan-container');
+    const slogan = document.getElementById('slogan');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const startButton = document.getElementById('start-button');
+
+    // Timeline for animations
+    const timeline = gsap.timeline();
+
+    // Show slogan animation after video ends
+    video.addEventListener('ended', () => {
+      gsap.to(sloganContainer, {
+        opacity: 1,
+        duration: 1,
+        onComplete: () => {
+          timeline
+            .to("#slogan", {
+              text: "A Central Hub for All Tasty Things!",
+              duration: 3,
+              ease: "power1.inOut",
+              onComplete: () => {
+                loadingSpinner.style.display = "block";
+                setTimeout(() => {
+                  startButton.style.display = "block";
+                }, 2000);
+              }
+            });
+        }
+      });
+    });
+
+    // Redirect to the next page when the button is clicked
+    startButton.addEventListener('click', () => {
+      window.location.href = 'Recipe-Recommendation\Login\login.html'; // Use forward slashes for URL paths
+    });
+
+    // Ensure audio is played (if needed)
+    video.muted = false;
+    video.play();
+  </script>
+</body>
+</html>

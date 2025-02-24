@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Donation Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Dark mode colors */
+        :root {
+            --dark-bg: #928dab;
+            --dark-surface: #1f1c2c;
+            --dark-text: #ffffff;
+            --dark-secondary: #b3b3b3;
+            --dark-primary: #bb86fc;
+            --dark-card: #2d2d2d;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .food-card {
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+            background-color: var(--dark-card);
+            border: 1px solid var(--dark-surface);
+        }
+
+        .card {
+            background-color: var(--dark-card);
+            border-color: var(--dark-surface);
+        }
+
+        .card-body {
+            color: var(--dark-text);
+        }
+
+        .text-muted {
+            color: var(--dark-secondary) !important;
+        }
+
+        .search-container {
+            background-color: var(--dark-surface);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: var(--dark-card);
+            border-color: var(--dark-surface);
+            color: var(--dark-text);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--dark-card);
+            border-color: var(--dark-primary);
+            color: var(--dark-text);
+            box-shadow: 0 0 0 0.25rem rgba(187, 134, 252, 0.25);
+        }
+
+        .modal-content {
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+        }
+
+        .modal-header {
+            border-bottom-color: var(--dark-card);
+        }
+
+        .modal-footer {
+            border-top-color: var(--dark-card);
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+
+
+        /* Override Bootstrap primary colors */
+        .btn-primary {
+            background-color: var(--dark-primary);
+            border-color: var(--dark-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #9965f4;
+            border-color: #9965f4;
+
+        }
+
+        .bg-primary {
+            background-color: var(--dark-surface) !important;
+
+        }
+
+        /* Input placeholder color */
+        ::placeholder {
+            color: var(--dark-secondary) !important;
+            opacity: 0.7;
+        }
+
+        /* File input specific styling */
+        input[type="file"]::file-selector-button {
+            background-color: var(--dark-primary);
+            /* color: var(--dark-bg); */
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: #9965f4;
+        }
+
+        /* Links in dark mode */
+        a {
+            color: var(--dark-primary);
+        }
+
+        a:hover {
+            color: #9965f4;
+        }
+
+        /* Keep existing styles */
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .timer {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('https://images.unsplash.com/photo-1488459716781-31db52582fe9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            color: var(--dark-text);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+        }
+
+        .hero-quote {
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        .delete-btn {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .food-card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .alert {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="Images/Tasty.png" alt="Tasty Hub Logo"> Tasty Hub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dummycategory.html">Category</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="donate.html">Food Donation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+
+                </ul>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#donateModal">
+                    Donate Food
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1>Share Food, Share Love</h1>
+            <p class="hero-quote">
+                "If you can't feed a hundred people, then feed just one." - Mother Teresa
+            </p>
+            <p class="mt-4">
+                Join our community in reducing food waste and helping those in need.
+                <br>Every donation makes a difference.
+            </p>
+            <button class="btn btn-success btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#donateModal">
+                Start Donating Now
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="container mt-4">
+        <div class="search-container">
+            <h4 class="mb-3">Find Food Donations Near You</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="locationSearch" placeholder="Enter your location">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="radius">
+                        <option value="1">Within 1 km</option>
+                        <option value="5">Within 5 km</option>
+                        <option value="10">Within 10 km</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" onclick="searchFood()">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Listings -->
+    <div class="container">
+        <div class="row" id="foodListings">
+            <!-- Sample Food Card -->
+            <div class="col-md-4">
+                <div class="card food-card">
+                    <img src="Images/Tasty.png" class="card-img-top" alt="Food Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Homemade Pasta</h5>
+                        <p class="card-text">Fresh homemade pasta with sauce. Serves 4 people.</p>
+                        <p class="card-text"><small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> 123 Main St, City
+                            </small></p>
+                        <p class="card-text timer">
+                            <i class="fas fa-clock"></i> Expires in: <span class="countdown">2:30:00</span>
+                        </p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            Contact Donor
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donate Food Modal -->
+    <div class="modal fade" id="donateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Donate Food</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="donationForm">
+                        <div class="mb-3">
+                            <label class="form-label">Food Description</label>
+                            <input type="text" class="form-control" name="description" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Number of Servings</label>
+                            <input type="number" class="form-control" name="servings" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Available Until</label>
+                            <input type="datetime-local" class="form-control" name="availableUntil" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload Photo</label>
+                            <input type="file" class="form-control" name="photo" accept="image/*" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Information</label>
+                            <input type="tel" class="form-control" name="contact" placeholder="Phone Number" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitDonation()">Post Donation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Contact Donor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Contact info will be dynamically inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', loadSavedListings);
+
+        // Timer Functions
+        function updateTimer() {
+            document.querySelectorAll('.countdown').forEach(timer => {
+                let [h, m, s] = timer.textContent.split(':').map(Number);
+                if (s > 0) s--;
+                else if (m > 0) { m--; s = 59; }
+                else if (h > 0) { h--; m = 59; s = 59; }
+
+                timer.textContent = `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                if (h === 0 && m === 0 && s === 0) timer.closest('.food-card').remove();
+            });
+        }
+        setInterval(updateTimer, 1000);
+
+        // Storage Functions
+        function saveListingToStorage(listing) {
+            const listings = JSON.parse(localStorage.getItem('foodListings') || '[]');
+            listings.push(listing);
+            localStorage.setItem('foodListings', JSON.stringify(listings));
+        }
+
+        function loadSavedListings() {
+            const listings = JSON.parse(localStorage.getItem('foodListings') || '[]')
+                .filter(listing => new Date(listing.expiryTime) > new Date());
+
+            localStorage.setItem('foodListings', JSON.stringify(listings));
+            listings.forEach(listing => {
+                const card = createFoodCard({
+                    ...listing,
+                    expiryTime: calculateTimeRemaining(listing.expiryTime)
+                });
+                document.getElementById('foodListings').insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        // UI Functions
+        function createFoodCard(listing) {
+            return `
+                <div class="col-md-4">
+                    <div class="card food-card" data-id="${listing.createdAt}">
+                        <div class="position-relative">
+                            <img src="${listing.image}" class="card-img-top" alt="Food Image">
+                            <button class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 delete-btn" 
+                                    onclick="deleteListing('${listing.createdAt}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">${listing.title}</h5>
+                            <p class="card-text">Serves ${listing.servings} people</p>
+                            <p class="card-text"><small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> ${listing.location}
+                            </small></p>
+                            <p class="card-text timer">
+                                <i class="fas fa-clock"></i> Expires in: <span class="countdown">${listing.expiryTime}</span>
+                            </p>
+                            <button class="btn btn-primary" onclick="showContactInfo('${listing.contact}')" 
+                                    data-bs-toggle="modal" data-bs-target="#contactModal">
+                                Contact Donor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function deleteListing(listingId) {
+            if (!confirm('Are you sure you want to delete this listing?')) {
+                return;
+            }
+
+            // Remove from DOM
+            const card = document.querySelector(`.food-card[data-id="${listingId}"]`);
+            if (card) {
+                card.closest('.col-md-4').remove();
+            }
+
+            // Remove from localStorage
+            const listings = JSON.parse(localStorage.getItem('foodListings') || '[]');
+            const updatedListings = listings.filter(listing => listing.createdAt !== listingId);
+            localStorage.setItem('foodListings', JSON.stringify(updatedListings));
+
+            // Show success message
+            showNotification('Listing deleted successfully');
+        }
+
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success position-fixed top-0 end-0 m-3';
+            notification.style.zIndex = '1050';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            // Add to document
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function submitDonation() {
+            const form = document.getElementById('donationForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const photoFile = formData.get('photo');
+
+            const imageUrl = photoFile instanceof File ?
+                URL.createObjectURL(photoFile) :
+                'https://via.placeholder.com/300';
+
+            const listing = {
+                image: imageUrl,
+                title: formData.get('description'),
+                servings: formData.get('servings'),
+                location: formData.get('location'),
+                expiryTime: formData.get('availableUntil'),
+                contact: formData.get('contact'),
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to storage and update UI
+            saveListingToStorage(listing);
+
+            const timeRemaining = calculateTimeRemaining(listing.expiryTime);
+            const cardHtml = createFoodCard({ ...listing, expiryTime: timeRemaining });
+            document.getElementById('foodListings').insertAdjacentHTML('afterbegin', cardHtml);
+
+            // Close modal and reset form
+            const modal = document.getElementById('donateModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+            form.reset();
+
+            // Show success message
+            showNotification('Donation posted successfully');
+        }
+
+        // Helper Functions
+        function calculateTimeRemaining(endTime) {
+            const diff = new Date(endTime) - new Date();
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function searchFood() {
+            const search = document.getElementById('locationSearch').value.toLowerCase();
+            document.querySelectorAll('.food-card').forEach(card => {
+                const location = card.querySelector('.text-muted').textContent.toLowerCase();
+                card.closest('.col-md-4').style.display =
+                    (search === '' || location.includes(search)) ? 'block' : 'none';
+            });
+
+            // Show/hide no results message
+            const hasResults = document.querySelector('.col-md-4[style="display: block"]');
+            const noResults = document.getElementById('noResults');
+
+            if (!hasResults && search !== '') {
+                if (!noResults) {
+                    document.getElementById('foodListings').insertAdjacentHTML('beforeend', `
+                        <div id="noResults" class="col-12 text-center mt-4">
+                            <h5>No food donations found in "${search}"</h5>
+                            <p>Try searching for a different location or check back later.</p>
+                        </div>
+                    `);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('locationSearch').addEventListener('input', e => {
+            if (e.target.value === '') searchFood();
+        });
+
+        document.getElementById('locationSearch').addEventListener('keypress', e => {
+            if (e.key === 'Enter') searchFood();
+        });
+
+        // Add function to update contact modal
+        function showContactInfo(contact) {
+            const modalBody = document.querySelector('#contactModal .modal-body');
+            modalBody.innerHTML = `
+                <p><i class="fas fa-phone"></i> Phone: <a href="tel:${contact}">${contact}</a></p>
+            `;
+        }
+    </script>
+</body>
+
+</html>

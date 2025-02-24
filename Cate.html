@@ -7,22 +7,6 @@
     <title>Tasty Hub - Categories</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
-#backBtn {
-    background-color: #ff5733;
-    color: white;
-    padding: 10px 15px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    border-radius: 5px;
-}
-
-#backBtn:hover {
-    background-color: #c70039;
-}
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +16,6 @@
         body {
             font-family: "Poppins", sans-serif;
             padding: 20px;
-            /* background-color: azure; */
             background-color: #928dab;
         }
 
@@ -42,21 +25,12 @@
             padding-top: 80px;
         }
 
-        .nav-container img {
-            width: 35px;
-            height: auto;
-            margin: 0 8px;
-
-        }
-
         h1 {
             text-align: center;
             margin-bottom: 30px;
-            /* color: #333; */
             color: #1f1c2c;
             opacity: 0;
             font-size: 2.6rem;
-
         }
 
         .category-grid {
@@ -72,6 +46,7 @@
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             opacity: 0;
+            cursor: pointer;
         }
 
         .category-image {
@@ -134,124 +109,55 @@
             font-size: 1rem;
         }
 
-        .close-button {
+        .close-button,
+        .back-button {
             position: fixed;
             top: 20px;
-            right: 20px;
             background: white;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
             opacity: 0;
+            font-size: 16px;
         }
 
-        /* Add navbar styles */
-        .navbar {
-            /* background-color: #333; */
-            background-color: #1f1c2c;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
+        .close-button {
+            right: 20px;
         }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .back-button {
+            left: 20px;
         }
 
-        .nav-logo {
+        .close-button:hover,
+        .back-button:hover {
+            background-color: #ff5733;
             color: white;
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-            width: 100%;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #928dab;
-            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-<button id="backBtn">⬅ Back</button>
-    <nav class="navbar">
-        <div class="nav-container">
-            <img src="Tasty.png" alt="">
-            <a href="index.html" class="nav-logo">Tasty Hub</a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="donate.html">Donate</a>
-                <a href="dummycategory.html">Categories</a>
-                <a href="contact.html">Contact</a>
-            </div>
-        </div>
-    </nav>
-
     <div class="container">
         <h1>Tasty Hub</h1>
         <div class="category-grid" id="categoryGrid"></div>
     </div>
 
-
+    <!-- Recipes Popup -->
     <div class="recipes-container" id="recipesContainer">
+        <button class="back-button" onclick="closeRecipes()">⬅ Back</button>
         <button class="close-button" onclick="closeRecipes()">Close</button>
         <div class="recipes-grid" id="recipesGrid"></div>
     </div>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            // Add navbar animation
-            gsap.from('.navbar', {
-                y: -100,
-                opacity: 0,
-                duration: 1,
-                ease: 'power2.out'
-            });
-document.getElementById("backBtn").addEventListener("click", function() {
-    window.history.back(); // Go to the previous page
-});
-
-            // Existing animations
-            gsap.to('h1', {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                ease: 'power2.out',
-                delay: 0.5 // Add delay to start after navbar animation
-            });
-
-            gsap.to('.category-card', {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power2.out',
-                delay: 0.7 // Add delay to start after heading animation
-            });
+            gsap.to('h1', { opacity: 1, y: 0, duration: 1, ease: 'power2.out', delay: 0.5 });
+            gsap.to('.category-card', { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out', delay: 0.7 });
         });
 
-        // Categories to fetch
+        // Categories List
         const categories = [
             { id: 'c', name: 'Chicken', query: 'c=Chicken' },
             { id: 'a', name: 'Beef', query: 'c=Beef' },
@@ -261,15 +167,14 @@ document.getElementById("backBtn").addEventListener("click", function() {
             { id: 'p', name: 'Pasta', query: 'c=Pasta' }
         ];
 
-        // Create category cards
+        // Display categories
         const categoryGrid = document.getElementById('categoryGrid');
         categories.forEach(category => {
             const card = document.createElement('div');
             card.className = 'category-card';
             card.innerHTML = `
                 <img src="https://www.themealdb.com/images/category/${category.name.toLowerCase()}.png" 
-                     alt="${category.name}" 
-                     class="category-image"
+                     alt="${category.name}" class="category-image"
                      onerror="this.src='https://via.placeholder.com/200x200?text=${category.name}'">
                 <div class="category-info">
                     <h2 class="category-title">${category.name}</h2>
@@ -279,36 +184,15 @@ document.getElementById("backBtn").addEventListener("click", function() {
             categoryGrid.appendChild(card);
         });
 
-        // Add hover animations for category cards
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                gsap.to(card, {
-                    scale: 1.05,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
-            });
-
-            card.addEventListener('mouseleave', () => {
-                gsap.to(card, {
-                    scale: 1,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                });
-            });
-        });
-
-        // Function to show recipes for a category
+        // Show Recipes Function
         async function showRecipes(categoryQuery) {
             const recipesContainer = document.getElementById('recipesContainer');
             const recipesGrid = document.getElementById('recipesGrid');
+
             recipesGrid.innerHTML = 'Loading...';
             recipesContainer.style.display = 'block';
 
-            gsap.to(recipesContainer, {
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                duration: 0.3
-            });
+            gsap.to(recipesContainer, { backgroundColor: 'rgba(0,0,0,0.8)', duration: 0.3 });
 
             try {
                 const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?${categoryQuery}`);
@@ -325,44 +209,27 @@ document.getElementById("backBtn").addEventListener("click", function() {
                     recipesGrid.appendChild(recipeCard);
                 });
 
-                gsap.to('.recipes-grid', {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-
-                gsap.to('.close-button', {
-                    opacity: 1,
-                    duration: 0.3
-                });
+                gsap.to('.recipes-grid', { opacity: 1, y: 0, duration: 0.5 });
+                gsap.to('.close-button', { opacity: 1, duration: 0.3 });
+                gsap.to('.back-button', { opacity: 1, duration: 0.3 });
 
             } catch (error) {
                 recipesGrid.innerHTML = 'Error loading recipes. Please try again.';
             }
         }
 
-        // Function to close recipes modal
+        // Close Recipes Function
         function closeRecipes() {
             const recipesContainer = document.getElementById('recipesContainer');
 
-            gsap.to('.recipes-grid', {
-                opacity: 0,
-                y: 20,
-                duration: 0.3
-            });
-
-            gsap.to('.close-button', {
-                opacity: 0,
-                duration: 0.3
-            });
+            gsap.to('.recipes-grid', { opacity: 0, y: 20, duration: 0.3 });
+            gsap.to('.close-button', { opacity: 0, duration: 0.3 });
+            gsap.to('.back-button', { opacity: 0, duration: 0.3 });
 
             gsap.to(recipesContainer, {
                 backgroundColor: 'rgba(0,0,0,0)',
                 duration: 0.3,
-                onComplete: () => {
-                    recipesContainer.style.display = 'none';
-                }
+                onComplete: () => { recipesContainer.style.display = 'none'; }
             });
         }
     </script>

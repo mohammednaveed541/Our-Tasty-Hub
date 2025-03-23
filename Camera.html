@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Face Verification Camera</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    #video-container {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 5px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      transition: border-color 0.3s ease;
+    }
+    #video, #photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+    }
+    #photo {
+      display: none;
+    }
+    canvas {
+      display: none;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1 style="text-align: center;">Face Verification Camera</h1>
+    <div id="video-container">
+      <video id="video" autoplay></video>
+      <img id="photo" alt="Captured Photo" />
+    </div>
+    <canvas id="canvas"></canvas>
+    <div style="text-align: center;">
+      <button id="capture">Capture Photo</button>
+      <button id="save" disabled>Save to Firebase</button>
+    </div>
+  </div>
+
+  <!-- Firebase UMD SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+  <script>
+    window.addEventListener('load', async () => {
+      if (!firebase || !firebase.app) {
+        console.error('Firebase SDK not loaded properly');
+        return;
+      }
+
+      // Firebase Configuration
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      const app = firebase.initializeApp(firebaseConfig);
+      const storage = firebase.storage();
+
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const captureButton = document.getElementById('capture');
+      const saveButton = document.getElementById('save');
+      const photo = document.getElementById('photo');
+      const context = canvas.getContext('2d');
+      const videoContainer = document.getElementById('video-container');
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then((stream) => {
+            video.srcObject = stream;
+          })
+          .catch((error) => {
+            console.error('Error accessing the camera:', error);
+            alert('Unable to access the camera. Please check permissions or device availability.');
+          });
+      } else {
+        alert('Camera not supported on this browser.');
+      }
+
+      // Load FaceAPI Models
+      try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/weights');
+        console.log('FaceAPI models loaded successfully');
+      } catch (error) {
+        console.error('Error loading FaceAPI models:', error);
+      }
+
+      // Face Detection
+      async function detectFace() {
+        try {
+          const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
+          if (detection) {
+            console.log('Face detected:', detection);
+            videoContainer.style.borderColor = 'green';
+          } else {
+            console.log('No face detected');
+            videoContainer.style.borderColor = 'red';
+          }
+        } catch (error) {
+          console.error('Error detecting face:', error);
+        }
+        requestAnimationFrame(detectFace);
+      }
+      detectFace();
+
+      // Capture Photo
+      captureButton.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL('image/jpeg');
+        photo.src = dataURL;
+        photo.style.display = 'block';
+        video.style.display = 'none';
+        alert('Photo captured!');
+        saveButton.disabled = false;
+      });
+
+      // Save to Firebase
+      saveButton.addEventListener('click', () => {
+        canvas.toBlob((blob) => {
+          const storageRef = storage.ref().child('images/photo_' + Date.now() + '.jpg');
+          storageRef.put(blob).then(() => {
+            alert('Photo uploaded to Firebase!');
+          }).catch((error) => {
+            console.error('Upload failed:', error);
+          });
+        }, 'image/jpeg');
+      });
+    });
+  </script>
+</body>
+</html>
